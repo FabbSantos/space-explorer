@@ -9,8 +9,8 @@ export const PLANETS_DATA = [
         orbitSpeed: 0.47,
         info: 'O menor planeta do Sistema Solar e o mais próximo do Sol.',
         moons: 0,
-        dayLength: '58.6 dias',
-        yearLength: '88 dias',
+        dayLength: '59 dias terrestres',
+        yearLength: '88 dias terrestres',
         temperature: '-173°C a 427°C',
         atmosphere: 'Quase inexistente',
         texture: 'mercury'
@@ -25,10 +25,10 @@ export const PLANETS_DATA = [
         orbitSpeed: 0.35,
         info: 'Conhecido como "Estrela da Manhã", tem uma atmosfera densa e tóxica.',
         moons: 0,
-        dayLength: '243 dias',
-        yearLength: '225 dias',
-        temperature: '462°C',
-        atmosphere: 'CO₂ (96%), N₂ (3%)',
+        dayLength: '243 dias terrestres',
+        yearLength: '225 dias terrestres',
+        temperature: '462°C (média)',
+        atmosphere: '96% dióxido de carbono, nuvens de ácido sulfúrico',
         texture: 'venus'
     },
     {
@@ -42,13 +42,11 @@ export const PLANETS_DATA = [
         info: 'Nosso planeta natal, o único conhecido com vida.',
         moons: 1,
         dayLength: '24 horas',
-        yearLength: '365 dias',
+        yearLength: '365.25 dias',
         temperature: '-88°C a 58°C',
-        atmosphere: 'N₂ (78%), O₂ (21%)',
+        atmosphere: '78% nitrogênio, 21% oxigênio',
         texture: 'earth',
-        moonData: [
-            { name: 'Lua', radius: 0.5, distance: 5, speed: 1 }
-        ]
+        hasMoon: true
     },
     {
         id: 'mars',
@@ -60,15 +58,11 @@ export const PLANETS_DATA = [
         orbitSpeed: 0.24,
         info: 'O "Planeta Vermelho", possível candidato para colonização futura.',
         moons: 2,
-        dayLength: '24.6 horas',
-        yearLength: '687 dias',
+        dayLength: '24h 37min',
+        yearLength: '687 dias terrestres',
         temperature: '-143°C a 35°C',
-        atmosphere: 'CO₂ (95%), N₂ (3%)',
-        texture: 'mars',
-        moonData: [
-            { name: 'Fobos', radius: 0.3, distance: 3, speed: 2 },
-            { name: 'Deimos', radius: 0.2, distance: 4, speed: 1.5 }
-        ]
+        atmosphere: '95% dióxido de carbono, muito fina',
+        texture: 'mars'
     },
     {
         id: 'jupiter',
@@ -79,18 +73,13 @@ export const PLANETS_DATA = [
         rotationSpeed: 0.02,
         orbitSpeed: 0.13,
         info: 'O maior planeta do Sistema Solar, um gigante gasoso.',
-        moons: 79,
-        dayLength: '9.9 horas',
-        yearLength: '12 anos',
-        temperature: '-108°C',
-        atmosphere: 'H₂ (90%), He (10%)',
+        moons: 95,
+        dayLength: '10 horas',
+        yearLength: '12 anos terrestres',
+        temperature: '-108°C (topo das nuvens)',
+        atmosphere: '90% hidrogênio, 10% hélio',
         texture: 'jupiter',
-        moonData: [
-            { name: 'Io', radius: 0.6, distance: 8, speed: 1.8 },
-            { name: 'Europa', radius: 0.5, distance: 10, speed: 1.4 },
-            { name: 'Ganimedes', radius: 0.8, distance: 12, speed: 1 },
-            { name: 'Calisto', radius: 0.7, distance: 14, speed: 0.8 }
-        ]
+        hasMoon: true
     },
     {
         id: 'saturn',
@@ -101,17 +90,49 @@ export const PLANETS_DATA = [
         rotationSpeed: 0.018,
         orbitSpeed: 0.09,
         info: 'Famoso por seus impressionantes anéis de gelo e rocha.',
-        moons: 82,
+        moons: 146,
         dayLength: '10.7 horas',
-        yearLength: '29 anos',
-        temperature: '-139°C',
-        atmosphere: 'H₂ (96%), He (3%)',
+        yearLength: '29 anos terrestres',
+        temperature: '-139°C (média)',
+        atmosphere: '96% hidrogênio, 3% hélio',
         texture: 'saturn',
         hasRings: true,
-        moonData: [
-            { name: 'Titã', radius: 0.8, distance: 10, speed: 0.9 },
-            { name: 'Encélado', radius: 0.3, distance: 7, speed: 1.2 }
-        ]
+        hasMoon: true
+    },
+    {
+        id: 'uranus',
+        name: 'Urano',
+        radius: 4,
+        distance: 110,
+        color: '#4FD0E7',
+        rotationSpeed: 0.015,
+        orbitSpeed: 0.06,
+        info: 'O planeta inclinado, gira de lado com um eixo quase horizontal.',
+        moons: 27,
+        dayLength: '17.2 horas',
+        yearLength: '84 anos terrestres',
+        temperature: '-195°C (média)',
+        atmosphere: '82% hidrogênio, 15% hélio, 2% metano',
+        texture: 'uranus',
+        hasRings: true,
+        hasMoon: true
+    },
+    {
+        id: 'neptune',
+        name: 'Netuno',
+        radius: 3.9,
+        distance: 130,
+        color: '#4B70DD',
+        rotationSpeed: 0.016,
+        orbitSpeed: 0.05,
+        info: 'O planeta mais distante, com os ventos mais rápidos do Sistema Solar.',
+        moons: 16,
+        dayLength: '16.1 horas',
+        yearLength: '165 anos terrestres',
+        temperature: '-200°C (média)',
+        atmosphere: '80% hidrogênio, 19% hélio, traços de metano',
+        texture: 'neptune',
+        hasMoon: true
     }
 ]
 

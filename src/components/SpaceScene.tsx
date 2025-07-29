@@ -2,6 +2,7 @@ import { Canvas } from '@react-three/fiber'
 import { Stars, OrbitControls } from '@react-three/drei'
 import { Suspense, useState } from 'react'
 import Planet from './Planet'
+import Sun from './Sun'
 import CameraControls from './CameraControls'
 import HUD from './UI/HUD'
 import PlanetPopup from './UI/PlanetPopup'
@@ -18,11 +19,12 @@ export default function SpaceScene() {
                 gl={{ antialias: true, alpha: false }}
             >
                 <Suspense fallback={null}>
-                    {/* Iluminação */}
-                    <ambientLight intensity={0.15} />
-                    <pointLight position={[0, 0, 0]} intensity={4} color="#FDB813" />
-                    <pointLight position={[100, 0, 0]} intensity={0.5} color="#FFFFFF" />
-                    <pointLight position={[-100, 0, 0]} intensity={0.5} color="#FFFFFF" />
+                    {/* Iluminação melhorada */}
+                    <ambientLight intensity={0.2} />
+                    <pointLight position={[0, 0, 0]} intensity={5} color="#FDB813" />
+                    <pointLight position={[150, 50, 0]} intensity={1} color="#FFFFFF" />
+                    <pointLight position={[-150, -50, 0]} intensity={1} color="#FFFFFF" />
+                    <directionalLight position={[0, 0, 100]} intensity={0.3} color="#FFFFFF" />
 
                     {/* Estrelas de fundo */}
                     <Stars
@@ -35,25 +37,8 @@ export default function SpaceScene() {
                         speed={1}
                     />
 
-                    {/* Sol */}
-                    <mesh position={[0, 0, 0]}>
-                        <sphereGeometry args={[10, 64, 64]} />
-                        <meshBasicMaterial color="#FDB813" />
-                    </mesh>
-
-                    {/* Glow do sol - múltiplas camadas */}
-                    <mesh position={[0, 0, 0]}>
-                        <sphereGeometry args={[12, 64, 64]} />
-                        <meshBasicMaterial color="#FFA500" transparent opacity={0.4} />
-                    </mesh>
-                    <mesh position={[0, 0, 0]}>
-                        <sphereGeometry args={[14, 64, 64]} />
-                        <meshBasicMaterial color="#FF8C00" transparent opacity={0.2} />
-                    </mesh>
-                    <mesh position={[0, 0, 0]}>
-                        <sphereGeometry args={[16, 64, 64]} />
-                        <meshBasicMaterial color="#FF6347" transparent opacity={0.1} />
-                    </mesh>
+                    {/* Sol com textura animada */}
+                    <Sun />
 
                     {/* Partículas espaciais */}
                     <SpaceParticles />

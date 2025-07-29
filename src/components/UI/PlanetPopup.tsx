@@ -1,4 +1,6 @@
-import { useEffect } from 'react'
+import { useEffect, Suspense } from 'react'
+import { Canvas } from '@react-three/fiber'
+import PlanetPreview from './PlanetPreview'
 
 interface PlanetPopupProps {
   planet: {
@@ -13,6 +15,7 @@ interface PlanetPopupProps {
     yearLength?: string
     temperature?: string
     atmosphere?: string
+    hasRings?: boolean
   } | null
   onClose: () => void
 }
@@ -52,11 +55,22 @@ export default function PlanetPopup({ planet, onClose }: PlanetPopupProps) {
         </div>
 
         {/* Planet Preview */}
-        <div className="w-32 h-32 mx-auto mb-4 relative">
-          <div
-            className="w-full h-full rounded-full shadow-lg"
-            style={{ backgroundColor: planet.color }}
-          />
+        <div className="w-48 h-48 mx-auto mb-4 relative bg-black/50 rounded-full">
+          <Canvas
+            camera={{ position: [0, 0, 6], fov: 45 }}
+            gl={{ antialias: true, alpha: true }}
+          >
+            <ambientLight intensity={0.3} />
+            <pointLight position={[10, 10, 10]} intensity={2} />
+            <pointLight position={[-10, -10, -10]} intensity={0.5} />
+            <Suspense fallback={null}>
+              <PlanetPreview
+                planetId={planet.id}
+                hasRings={planet.hasRings}
+                radius={1.5}
+              />
+            </Suspense>
+          </Canvas>
         </div>
 
         {/* Info */}

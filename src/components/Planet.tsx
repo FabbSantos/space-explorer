@@ -1,8 +1,9 @@
 import { useRef, useState, useMemo } from 'react'
 import { useFrame } from '@react-three/fiber'
-import { Mesh } from 'three'
+import { Mesh, Group } from 'three'
 import { createPlanetMaterial } from '@/utils/planetMaterials'
 import Moon from './Moon'
+import SaturnRings from './SaturnRings'
 
 interface PlanetProps {
     id: string
@@ -26,11 +27,11 @@ interface PlanetProps {
 
 export default function Planet(props: PlanetProps) {
     const meshRef = useRef<Mesh>(null)
-    const ringsRef = useRef<Mesh>(null)
+    const ringsGroupRef = useRef<Group>(null)
     const [hovered, setHovered] = useState(false)
 
-    // Material com textura procedural
-    const materialProps = useMemo(() => createPlanetMaterial(props.id), [props.id])
+    // Material com textura procedural (retorna um objeto Material do Three.js)
+    const material = useMemo(() => createPlanetMaterial(props.id), [props.id])
 
     // Estado inicial da órbita
     const orbitAngle = useRef(Math.random() * Math.PI * 2)
@@ -47,8 +48,8 @@ export default function Planet(props: PlanetProps) {
             meshRef.current.position.z = Math.sin(orbitAngle.current) * props.distance
 
             // Atualizar posição dos anéis
-            if (ringsRef.current) {
-                ringsRef.current.position.copy(meshRef.current.position)
+            if (ringsGroupRef.current) {
+                ringsGroupRef.current.position.copy(meshRef.current.position)
             }
         }
     })
@@ -57,8 +58,8 @@ export default function Planet(props: PlanetProps) {
         <group>
             {/* Órbita visual */}
             <mesh rotation={[-Math.PI / 2, 0, 0]}>
-                <ringGeometry args={[props.distance - 0.1, props.distance + 0.1, 64]} />
-                <meshBasicMaterial color="#444444" opacity={0.3} transparent />
+                <ringGeometry args={[props.distance - 0.1, props.distance + 0.1, 256]} />
+                <meshBasicMaterial color="#444444" opacity={0.2} transparent />
             </mesh>
 
             {/* Planeta */}
@@ -81,24 +82,18 @@ export default function Planet(props: PlanetProps) {
                 }}
                 scale={hovered ? 1.1 : 1}
             >
-                <sphereGeometry args={[props.radius, 64, 64]} />
-                <meshStandardMaterial {...materialProps} />
+                <sphereGeometry args={[props.radius, 128, 128]} />
+                <primitive object={material} attach="material" />
             </mesh>
 
             {/* Anéis de Saturno */}
             {props.hasRings && (
-                <mesh
-                    ref={ringsRef}
-                    rotation={[-0.3, 0, 0]}
-                >
-                    <ringGeometry args={[props.radius * 1.4, props.radius * 2.3, 64]} />
-                    <meshBasicMaterial
-                        color="#E5C995"
-                        opacity={0.8}
-                        transparent
-                        side={2}
+                <group ref={ringsGroupRef}>
+                    <SaturnRings
+                        innerRadius={props.radius * 1.4}
+                        outerRadius={props.radius * 2.3}
                     />
-                </mesh>
+                </group>
             )}
 
             {/* Luas */}
