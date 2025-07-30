@@ -7,6 +7,7 @@ import CameraControls from './CameraControls'
 import HUD from './UI/HUD'
 import PlanetPopup from './UI/PlanetPopup'
 import SpaceParticles from './SpaceParticles'
+import SolarFlare from './SolarFlare'
 import { PLANETS_DATA } from '@/lib/constants'
 
 export default function SpaceScene() {
@@ -37,8 +38,9 @@ export default function SpaceScene() {
                         speed={1}
                     />
 
-                    {/* Sol com textura animada */}
+                    {/* Sol com ejeções de massa coronal */}
                     <Sun />
+                    <SolarFlare />
 
                     {/* Partículas espaciais */}
                     <SpaceParticles />
