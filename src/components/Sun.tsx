@@ -7,7 +7,7 @@ export default function Sun() {
     const materialRef = useRef<THREE.ShaderMaterial>(null)
     const coronaRef = useRef<THREE.Mesh>(null)
 
-    // Shader material customizado para o sol
+    // Shader material melhorado para o sol
     const sunMaterial = useMemo(() => {
         return new THREE.ShaderMaterial({
             uniforms: {
@@ -130,13 +130,13 @@ export default function Sun() {
           color = mix(color, colorC, granulation * 0.3);
           color = mix(color * 0.7, color, spots);
           
-          // Brilho nas bordas (limb brightening para o Sol)
-          float limb = 1.0 - dot(vNormal, vec3(0.0, 0.0, 1.0));
-          limb = pow(limb, 0.4);
-          color += vec3(0.3, 0.2, 0.1) * limb;
+          // Brilho natural nas bordas (limb brightening)
+          float fresnel = 1.0 - dot(normalize(vNormal), vec3(0.0, 0.0, 1.0));
+          fresnel = pow(fresnel, 2.0);
+          color += vec3(0.4, 0.3, 0.1) * fresnel;
           
-          // Adicionar brilho variável
-          float brightness = 0.9 + 0.1 * sin(time * 2.0 + plasma * 10.0);
+          // Adicionar brilho variável mais sutil
+          float brightness = 0.95 + 0.05 * sin(time * 1.5 + plasma * 8.0);
           color *= brightness;
           
           gl_FragColor = vec4(color, 1.0);
@@ -145,7 +145,7 @@ export default function Sun() {
         })
     }, [])
 
-    // Material para a corona com raios solares
+    // Material para corona mais sutil e natural
     const coronaMaterial = useMemo(() => {
         return new THREE.ShaderMaterial({
             uniforms: {
@@ -153,52 +153,44 @@ export default function Sun() {
             },
             transparent: true,
             side: THREE.BackSide,
+            blending: THREE.AdditiveBlending,
             vertexShader: `
         varying vec2 vUv;
-        varying vec3 vPosition;
+        varying vec3 vNormal;
         
         void main() {
           vUv = uv;
-          vPosition = position;
+          vNormal = normalize(normalMatrix * normal);
           gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
         }
       `,
             fragmentShader: `
         uniform float time;
         varying vec2 vUv;
-        varying vec3 vPosition;
+        varying vec3 vNormal;
         
         void main() {
           vec2 center = vec2(0.5, 0.5);
           float dist = distance(vUv, center);
           
-          // Criar raios radiais
-          float angle = atan(vUv.y - 0.5, vUv.x - 0.5);
-          float rays = sin(angle * 12.0 + time) * 0.5 + 0.5;
-          rays *= sin(angle * 8.0 - time * 0.7) * 0.5 + 0.5;
-          rays *= sin(angle * 6.0 + time * 1.5) * 0.5 + 0.5;
+          // Corona sutil com gradiente natural
+          float corona = 1.0 - smoothstep(0.0, 0.8, dist);
+          corona = pow(corona, 3.0);
           
-          // Erupções solares animadas
-          float flare1 = sin(time * 3.0 + angle * 5.0) * 0.5 + 0.5;
-          float flare2 = sin(time * 2.0 - angle * 7.0) * 0.5 + 0.5;
-          float flares = max(flare1, flare2);
+          // Variação temporal suave
+          float flicker = 0.8 + 0.2 * sin(time * 2.0);
+          corona *= flicker;
           
-          // Gradiente radial
-          float glow = 1.0 - smoothstep(0.0, 0.5, dist);
-          glow = pow(glow, 2.0);
+          // Fresnel effect para tornar mais realista nas bordas
+          float fresnel = 1.0 - dot(normalize(vNormal), vec3(0.0, 0.0, 1.0));
+          fresnel = pow(fresnel, 1.5);
           
-          // Combinar efeitos
-          float intensity = glow * rays * flares;
-          intensity *= 0.6 + 0.4 * sin(time * 2.0);
+          float intensity = corona * fresnel * 0.3;
           
-          // Cores da corona
-          vec3 color = mix(
-            vec3(1.0, 0.9, 0.6),
-            vec3(1.0, 0.5, 0.2),
-            pow(dist, 2.0)
-          );
+          // Cores da corona (mais amarelada e natural)
+          vec3 color = vec3(1.0, 0.95, 0.7);
           
-          gl_FragColor = vec4(color, intensity * 0.8);
+          gl_FragColor = vec4(color, intensity);
         }
       `
         })
@@ -211,7 +203,7 @@ export default function Sun() {
         }
         if (coronaRef.current && coronaRef.current.material) {
             (coronaRef.current.material as THREE.ShaderMaterial).uniforms.time.value = state.clock.elapsedTime
-            coronaRef.current.rotation.z += 0.0005
+            coronaRef.current.rotation.z += 0.0003
         }
         if (meshRef.current) {
             meshRef.current.rotation.y += 0.001
@@ -226,26 +218,10 @@ export default function Sun() {
                 <primitive ref={materialRef} object={sunMaterial} />
             </mesh>
 
-            {/* Corona com raios */}
-            <mesh ref={coronaRef} scale={2.5}>
+            {/* Corona sutil e natural */}
+            <mesh ref={coronaRef} scale={1.3}>
                 <sphereGeometry args={[10, 64, 64]} />
                 <primitive object={coronaMaterial} />
-            </mesh>
-
-            {/* Camadas adicionais de brilho */}
-            <mesh scale={1.3}>
-                <sphereGeometry args={[10, 32, 32]} />
-                <meshBasicMaterial color="#FFD700" transparent opacity={0.4} side={THREE.BackSide} />
-            </mesh>
-
-            <mesh scale={1.6}>
-                <sphereGeometry args={[10, 32, 32]} />
-                <meshBasicMaterial color="#FFA500" transparent opacity={0.2} side={THREE.BackSide} />
-            </mesh>
-
-            <mesh scale={2.0}>
-                <sphereGeometry args={[10, 32, 32]} />
-                <meshBasicMaterial color="#FF6347" transparent opacity={0.1} side={THREE.BackSide} />
             </mesh>
         </group>
     )

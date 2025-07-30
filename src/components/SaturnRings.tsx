@@ -1,4 +1,5 @@
-import { useMemo } from 'react'
+import { useMemo, useRef } from 'react'
+import { useFrame } from '@react-three/fiber'
 import * as THREE from 'three'
 
 interface SaturnRingsProps {
@@ -7,81 +8,158 @@ interface SaturnRingsProps {
 }
 
 export default function SaturnRings({ innerRadius, outerRadius }: SaturnRingsProps) {
-    const ringTexture = useMemo(() => {
-        const canvas = document.createElement('canvas')
-        canvas.width = 2048
-        canvas.height = 64
-        const ctx = canvas.getContext('2d')!
+    const ringsRef = useRef<THREE.Group>(null)
 
-        // Criar padrão de anéis com gaps
-        const rings = [
-            { start: 0, end: 0.15, opacity: 0.7, color: '#D4A76A' },
-            { start: 0.15, end: 0.18, opacity: 0.1, color: '#000000' }, // Gap
-            { start: 0.18, end: 0.35, opacity: 0.8, color: '#E5C995' },
-            { start: 0.35, end: 0.37, opacity: 0.05, color: '#000000' }, // Gap menor
-            { start: 0.37, end: 0.55, opacity: 0.9, color: '#F5E6D3' },
-            { start: 0.55, end: 0.57, opacity: 0.1, color: '#000000' }, // Gap
-            { start: 0.57, end: 0.75, opacity: 0.6, color: '#C8B88B' },
-            { start: 0.75, end: 0.76, opacity: 0.05, color: '#000000' }, // Gap fino
-            { start: 0.76, end: 0.90, opacity: 0.4, color: '#A0826D' },
-            { start: 0.90, end: 1.0, opacity: 0.2, color: '#8B7355' }
-        ]
+    const ringTextures = useMemo(() => {
+        // Anel principal (A Ring)
+        const createMainRing = () => {
+            const canvas = document.createElement('canvas')
+            canvas.width = 2048
+            canvas.height = 64
+            const ctx = canvas.getContext('2d')!
 
-        // Desenhar cada anel
-        rings.forEach(ring => {
-            const startX = ring.start * 2048
-            const width = (ring.end - ring.start) * 2048
+            // Gradiente base dourado
+            const baseGradient = ctx.createLinearGradient(0, 0, 2048, 0)
+            baseGradient.addColorStop(0, '#8B7355')
+            baseGradient.addColorStop(0.3, '#D4A76A')
+            baseGradient.addColorStop(0.6, '#F5E6D3')
+            baseGradient.addColorStop(0.8, '#E5C995')
+            baseGradient.addColorStop(1, '#C8B88B')
 
-            // Gradiente radial para cada anel
-            const gradient = ctx.createLinearGradient(startX, 0, startX + width, 0)
+            ctx.fillStyle = baseGradient
+            ctx.fillRect(0, 0, 2048, 64)
 
-            if (ring.color !== '#000000') {
-                gradient.addColorStop(0, `${ring.color}00`)
-                gradient.addColorStop(0.1, `${ring.color}${Math.floor(ring.opacity * 255).toString(16)}`)
-                gradient.addColorStop(0.5, `${ring.color}${Math.floor(ring.opacity * 255).toString(16)}`)
-                gradient.addColorStop(0.9, `${ring.color}${Math.floor(ring.opacity * 255).toString(16)}`)
-                gradient.addColorStop(1, `${ring.color}00`)
-            } else {
-                gradient.addColorStop(0, 'rgba(0, 0, 0, 0)')
-                gradient.addColorStop(1, 'rgba(0, 0, 0, 0)')
+            // Adicionar micro-estruturas dos anéis
+            for (let x = 0; x < 2048; x += 1) {
+                const density = 0.7 + 0.3 * Math.sin(x * 0.05)
+                const variation = Math.random() * 0.4 + 0.6
+                const alpha = density * variation
+
+                // Partículas individuais
+                for (let y = 0; y < 64; y += 2) {
+                    if (Math.random() < 0.3) {
+                        const brightness = Math.random() * 0.5 + 0.5
+                        ctx.fillStyle = `rgba(255, 255, 255, ${alpha * brightness * 0.8})`
+                        ctx.fillRect(x, y, 1, 1)
+                    }
+                }
+
+                // Ondas de densidade
+                const wave = Math.sin(x * 0.01) * 0.2 + 0.8
+                ctx.fillStyle = `rgba(212, 167, 106, ${alpha * wave * 0.6})`
+                ctx.fillRect(x, 0, 1, 64)
             }
 
-            ctx.fillStyle = gradient
-            ctx.fillRect(startX, 0, width, 64)
+            return new THREE.CanvasTexture(canvas)
+        }
 
-            // Adicionar partículas/ruído aos anéis
-            if (ring.color !== '#000000') {
-                for (let i = 0; i < width; i += 2) {
-                    for (let j = 0; j < 64; j += 2) {
-                        if (Math.random() > 0.7) {
-                            ctx.fillStyle = `rgba(255, 255, 255, ${Math.random() * 0.3})`
-                            ctx.fillRect(startX + i, j, 1, 1)
-                        }
+        // Anel B (mais denso)
+        const createBRing = () => {
+            const canvas = document.createElement('canvas')
+            canvas.width = 1024
+            canvas.height = 32
+            const ctx = canvas.getContext('2d')!
+
+            // Base mais clara e densa
+            ctx.fillStyle = '#F5E6D3'
+            ctx.fillRect(0, 0, 1024, 32)
+
+            // Estrutura densa com variações
+            for (let x = 0; x < 1024; x++) {
+                const density = 0.9 + 0.1 * Math.sin(x * 0.08)
+                
+                // Spokes (raios radiais) - fenômeno real de Saturno
+                const spokeIntensity = Math.sin(x * 0.02) * 0.3
+                
+                for (let y = 0; y < 32; y++) {
+                    const particleDensity = Math.random()
+                    if (particleDensity < density) {
+                        const brightness = 0.8 + Math.random() * 0.2
+                        const spoke = spokeIntensity * Math.sin(y * 0.5)
+                        ctx.fillStyle = `rgba(245, 230, 211, ${brightness + spoke})`
+                        ctx.fillRect(x, y, 1, 1)
                     }
                 }
             }
-        })
 
-        const texture = new THREE.CanvasTexture(canvas)
-        texture.needsUpdate = true
-        return texture
+            return new THREE.CanvasTexture(canvas)
+        }
+
+        // Anel C (mais transparente)
+        const createCRing = () => {
+            const canvas = document.createElement('canvas')
+            canvas.width = 512
+            canvas.height = 16
+            const ctx = canvas.getContext('2d')!
+
+            ctx.fillStyle = 'rgba(200, 184, 139, 0.3)'
+            ctx.fillRect(0, 0, 512, 16)
+
+            // Partículas esparsas
+            for (let i = 0; i < 1000; i++) {
+                const x = Math.random() * 512
+                const y = Math.random() * 16
+                const size = Math.random() * 2 + 1
+                const opacity = Math.random() * 0.6 + 0.2
+
+                ctx.fillStyle = `rgba(255, 248, 220, ${opacity})`
+                ctx.fillRect(x, y, size, size)
+            }
+
+            return new THREE.CanvasTexture(canvas)
+        }
+
+        return {
+            mainRing: createMainRing(),
+            bRing: createBRing(),
+            cRing: createCRing()
+        }
     }, [])
 
-    const ringMaterial = useMemo(() => {
-        return new THREE.MeshBasicMaterial({
-            map: ringTexture,
-            transparent: true,
-            side: THREE.DoubleSide,
-            opacity: 0.8,
-            depthWrite: false,
-            blending: THREE.AdditiveBlending
-        })
-    }, [ringTexture])
+    // Animação sutil
+    useFrame(() => {
+        if (ringsRef.current) {
+            ringsRef.current.rotation.z += 0.0001
+        }
+    })
 
     return (
-        <mesh rotation={[-Math.PI / 2 + 0.3, 0, 0]}>
-            <ringGeometry args={[innerRadius, outerRadius, 128, 1]} />
-            <primitive object={ringMaterial} />
-        </mesh>
+        <group ref={ringsRef} rotation={[-Math.PI / 2 + 0.1, 0, 0]}>
+            {/* Anel C (interno, mais transparente) */}
+            <mesh>
+                <ringGeometry args={[innerRadius, innerRadius * 1.4, 128, 1]} />
+                <meshBasicMaterial
+                    map={ringTextures.cRing}
+                    transparent
+                    opacity={0.4}
+                    side={THREE.DoubleSide}
+                    blending={THREE.AdditiveBlending}
+                />
+            </mesh>
+
+            {/* Anel B (médio, mais denso) */}
+            <mesh>
+                <ringGeometry args={[innerRadius * 1.4, innerRadius * 1.8, 128, 1]} />
+                <meshBasicMaterial
+                    map={ringTextures.bRing}
+                    transparent
+                    opacity={0.9}
+                    side={THREE.DoubleSide}
+                />
+            </mesh>
+
+            {/* Gap Cassini (espaço entre B e A) */}
+            
+            {/* Anel A (externo, principal) */}
+            <mesh>
+                <ringGeometry args={[innerRadius * 1.9, outerRadius, 128, 1]} />
+                <meshBasicMaterial
+                    map={ringTextures.mainRing}
+                    transparent
+                    opacity={0.8}
+                    side={THREE.DoubleSide}
+                />
+            </mesh>
+        </group>
     )
 }
