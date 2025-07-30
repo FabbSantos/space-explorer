@@ -7,6 +7,7 @@ export const PLANETS_DATA = [
         color: '#8C7853',
         rotationSpeed: 0.01,
         orbitSpeed: 0.47,
+        eccentricity: 0.206, // Órbita mais elíptica
         info: 'O menor planeta do Sistema Solar e o mais próximo do Sol.',
         moons: 0,
         dayLength: '59 dias terrestres',
@@ -23,6 +24,7 @@ export const PLANETS_DATA = [
         color: '#FFC649',
         rotationSpeed: 0.008,
         orbitSpeed: 0.35,
+        eccentricity: 0.007, // Órbita quase circular
         info: 'Conhecido como "Estrela da Manhã", tem uma atmosfera densa e tóxica.',
         moons: 0,
         dayLength: '243 dias terrestres',
@@ -39,6 +41,7 @@ export const PLANETS_DATA = [
         color: '#4A90E2',
         rotationSpeed: 0.01,
         orbitSpeed: 0.29,
+        eccentricity: 0.017, // Órbita quase circular
         info: 'Nosso planeta natal, o único conhecido com vida.',
         moons: 1,
         dayLength: '24 horas',
@@ -56,6 +59,7 @@ export const PLANETS_DATA = [
         color: '#CD5C5C',
         rotationSpeed: 0.009,
         orbitSpeed: 0.24,
+        eccentricity: 0.093, // Órbita moderadamente elíptica
         info: 'O "Planeta Vermelho", possível candidato para colonização futura.',
         moons: 2,
         dayLength: '24h 37min',
@@ -72,6 +76,7 @@ export const PLANETS_DATA = [
         color: '#C88B3A',
         rotationSpeed: 0.02,
         orbitSpeed: 0.13,
+        eccentricity: 0.049, // Órbita levemente elíptica
         info: 'O maior planeta do Sistema Solar, um gigante gasoso.',
         moons: 95,
         dayLength: '10 horas',
@@ -89,6 +94,7 @@ export const PLANETS_DATA = [
         color: '#FAD5A5',
         rotationSpeed: 0.018,
         orbitSpeed: 0.09,
+        eccentricity: 0.052, // Órbita levemente elíptica
         info: 'Famoso por seus impressionantes anéis de gelo e rocha.',
         moons: 146,
         dayLength: '10.7 horas',
@@ -107,6 +113,7 @@ export const PLANETS_DATA = [
         color: '#4FD0E7',
         rotationSpeed: 0.015,
         orbitSpeed: 0.06,
+        eccentricity: 0.047, // Órbita levemente elíptica
         info: 'O planeta inclinado, gira de lado com um eixo quase horizontal.',
         moons: 27,
         dayLength: '17.2 horas',
@@ -125,6 +132,7 @@ export const PLANETS_DATA = [
         color: '#4B70DD',
         rotationSpeed: 0.016,
         orbitSpeed: 0.05,
+        eccentricity: 0.009, // Órbita quase circular
         info: 'O planeta mais distante, com os ventos mais rápidos do Sistema Solar.',
         moons: 16,
         dayLength: '16.1 horas',
